@@ -148,9 +148,21 @@ function Camera(cameraOut, x = 0, y = 0, z = 0, w = 0, fi = 0, k = 0){
   this.drawPoint = X => {
     const xp = this.convertToCameraLocal(X)
     const ctx = cameraOut;
-    ctx.strokeColor = "black"
+    ctx.strokeStyle = "black"
     ctx.beginPath();
-    ctx.arc(xp.get([0])-10, xp.get([1])-10, 10, 0, 2 * Math.PI);
+    ctx.arc(xp.get([0]), xp.get([1]), 10, 0, 2 * Math.PI);
+    ctx.stroke();
+  }
+
+  this.drawLine = (X, X1, color = "black") => {
+    const xp = this.convertToCameraLocal(X)
+    const xp1 = this.convertToCameraLocal(X1)
+    const ctx = cameraOut;
+    ctx.strokeStyle  = color;
+
+    ctx.beginPath();
+    ctx.moveTo(xp.get([0]), xp.get([1]));
+    ctx.lineTo(xp1.get([0]), xp1.get([1]));
     ctx.stroke();
   }
 }
@@ -169,13 +181,32 @@ const cube = [
   [300,0,300],
   [300,300,0],
   [300,300,300]
-]
+].map(p => math.add(p, [500,300,300]))
+
 
 let i = 0;
 setInterval(() => {
   for(const point of cube){
-    camera1.drawPoint(math.add(point, [500,300,300]))
+    camera1.drawPoint(point)
   }
+
+  camera1.drawLine(cube[0], cube[1]);
+  camera1.drawLine(cube[0], cube[2]);
+  camera1.drawLine(cube[0], cube[4]);
+  camera1.drawLine(cube[1], cube[3]);
+  camera1.drawLine(cube[3], cube[2]);
+  camera1.drawLine(cube[3], cube[7]);
+  camera1.drawLine(cube[7], cube[5]);
+  camera1.drawLine(cube[7], cube[6]);
+  camera1.drawLine(cube[6], cube[4]);
+  camera1.drawLine(cube[4], cube[5]);
+  camera1.drawLine(cube[6], cube[2]);
+  camera1.drawLine(cube[5], cube[1]);
+
+  camera1.drawLine([0,0,0],[300,0,0], "#f00");
+  camera1.drawLine([0,0,0],[0,300,0], "#00f");
+  camera1.drawLine([0,0,0],[0,0,300], "#0f0");
+  
   i++;
   if(i >= Math.PI*200){
     i = 0
@@ -195,6 +226,19 @@ window.addEventListener("keydown", e => {
       break;
     case "ArrowRight":
       camera1.fi -= 0.1
+      break;
+    
+    case "w":
+      camera1.z -= 10
+      break;
+    case "s":
+      camera1.z += 10
+      break;
+    case "a":
+      camera1.x += 10
+      break;
+    case "d":
+      camera1.x -= 10
       break;
   }
   ctx.clearRect(0, 0, canvas.width, canvas.height);
